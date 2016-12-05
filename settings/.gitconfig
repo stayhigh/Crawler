@@ -1,0 +1,17 @@
+[core]
+	editor = vim
+[user]
+	name = stayhigh
+	email = redhero0702@gmail.com
+[alias]
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+	st = status
+	d = difftool
+[credential]
+	helper = store
+[color]
+	ui = auto
+[diff]
+	tool = vimdiff
+[difftool]
+	prompt = false
