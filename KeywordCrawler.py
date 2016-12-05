@@ -2,7 +2,8 @@ import requests
 from lxml import html
 import argparse
 import sys
-
+import csv
+import os
 
 parser = argparse.ArgumentParser(description='search a keyword on Walmart.com, and list items on the specific page')
 parser.add_argument('keyword', help='search keyword')
@@ -12,6 +13,7 @@ args = parser.parse_args()
 # take keyword and page number from command line
 keyword = args.keyword
 pageNum = args.page
+query = sys.argv[1]
 
 # build the query url
 url = 'http://www.walmart.com/search/?query=%s&page=%d&cat_id=0' % (keyword, pageNum)
@@ -41,8 +43,15 @@ for item in items:
     if node:
         nameMark = node[0].xpath('mark/text()')
         name = node[0].xpath('text()')
-        if name and nameMark and len(name) >= 2:
-            itemName = '%s%s%s' % (name[0], nameMark[0], name[1])
+        #if name and nameMark and len(name) >= 2:
+        print "name:",name
+        print "nameMark:",nameMark
+        print "len(name):",len(name)
+        if name and len(name) == 1:
+            #itemName = '%s%s%s' % (name[0], nameMark[0], name[1])
+            itemName = '%s' % (name[0])
+        else:
+            print '! mulitiple items, we need to choose the best one for ' + query
 
     node = item.xpath('.//span[starts-with(@class, "price price-display")]')
     if node:
@@ -56,7 +65,35 @@ for item in items:
 
     res.append((link, itemName, price))
 
-print res
+#print res # res is a list of tuples
+#print 
+for eachitem in res:
+    print eachitem
+
+eachitemlist=list(eachitem)
+eachitemlist.insert(0, query)
+eachitem = tuple(eachitemlist)
+
+
+OUTPUTFILE="item_price_result.csv"
+if not os.path.isfile(OUTPUTFILE) or os.path.getsize(OUTPUTFILE) == 0:
+    with open(OUTPUTFILE, 'wb') as out:
+        print 'insert label at first row'
+        csv_out=csv.writer(out)
+        csv_out.writerow(["UPC","url", "item", "price"])
+    
+
+with open(OUTPUTFILE,'ab+') as out:
+    csv_out=csv.writer(out)
+    csv_out.writerow(eachitem)
+
+#data=[('smith, bob',2),('carol',3),('ted',4),('alice',5)]
+
+
+#with open('item_price_result.csv','wb') as out:
+#    csv_out.writerow(['name','num'])
+#            for row in data:
+#                        csv_out.writerow(row)
 
 """
 # link
